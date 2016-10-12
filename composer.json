@@ -1,0 +1,14 @@
+{
+    "name": "emersonstone/stagecraft",
+    "description": "Import and export fields and sections to and from a Craft site.",
+    "authors": [
+        {
+            "name": "Zachary Flower",
+            "email": "zach@emersonstone.com"
+        }
+    ],
+    "type": "craft-plugin",
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}

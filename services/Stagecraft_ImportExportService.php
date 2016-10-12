@@ -10,7 +10,7 @@ class Stagecraft_ImportExportService extends BaseApplicationComponent {
     $result = new Stagecraft_ResultModel();
 
     if ( $model = Stagecraft_ExportedDataModel::fromJson($json) ) {
-      foreach ( $model->attributeNames() as $section ) {
+      foreach ( $model as $section => $data ) {
         $service = "stagecraft_" . $section;
 
         $import = craft()->$service->import($model->$section);

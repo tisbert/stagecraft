@@ -32,11 +32,10 @@ class StagecraftPlugin extends BasePlugin {
 
   public function registerCpRoutes() {
     return array(
-      'stagecraft' => array('action' => 'stagecraft/exportFields'),
-      'stagecraft/version1' => array('action' => 'stagecraft/index'),
-      'stagecraft/export/fields' => array('action' => 'stagecraft/exportFields'),
-      'stagecraft/export/sections' => array('action' => 'stagecraft/exportSections'),
-      'stagecraft/import/1' => array('action' => 'stagecraft/importStep1'),
+      'stagecraft'                 => array('action' => 'stagecraft/index'),
+      'stagecraft/import'          => array('action' => 'stagecraft/importStep1'),
+      'stagecraft/import/confirm'  => array('action' => 'stagecraft/importStep2'),
+      'stagecraft/import/complete' => array('action' => 'stagecraft/importStep3'),
     );
   }
 }

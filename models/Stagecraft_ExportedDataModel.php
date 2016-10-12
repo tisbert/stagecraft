@@ -17,7 +17,7 @@ class Stagecraft_ExportedDataModel extends BaseModel {
   public static function fromJson($json) {
     $data = json_decode($json, true);
 
-    return $data ?: new static($data);
+    return $data === null ? null : new static($data);
   }
 
   protected function defineAttributes() {

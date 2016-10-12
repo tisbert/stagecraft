@@ -4,8 +4,8 @@
 
 
 {% set tabs = {
-export: { label: "Export"|t, url: url('stagecraft/export/fields') },
-import: { label: "Import"|t, url: url('stagecraft/import/1') },
+export: { label: "Export"|t, url: url('stagecraft') },
+import: { label: "Import"|t, url: url('stagecraft/import') },
 } %}
 
 {% set selectedTab = 'import' %}
@@ -27,7 +27,7 @@ import: { label: "Import"|t, url: url('stagecraft/import/1') },
 
     <div class="item">
         <form method="POST" accept-charset="UTF-8">
-          <input type="hidden" name="action" value="stagecraft/importstep3">
+          <input type="hidden" name="action" value="stagecraft/import/complete">
 
         {% if model.fields | length %}
           <h2>Fields to be imported</h2>

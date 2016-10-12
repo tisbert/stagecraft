@@ -6,8 +6,8 @@ class StagecraftController extends BaseController {
 
   public function actionIndex() {
     $this->renderTemplate('stagecraft/_index', array(
-      'groupOptions'     => $this->_getGroupOptions(),
-      'entryTypeOptions' => $this->_getSectionOptions(),
+      'groupOptions'   => $this->_getFieldGroups(),
+      'sectionOptions' => $this->_getSections(),
     ));
   }
 
@@ -42,100 +42,6 @@ class StagecraftController extends BaseController {
     craft()->userSession->setError(implode(', ', $result->errors));
   }
 
-  public function actionExportFields() {
-    $this->renderTemplate('stagecraft/_fieldExport', array(
-      'GroupOptions' => $this->_getGroupOptions(),
-    ));
-  }
-
-  public function actionExportSections() {
-    $this->renderTemplate('stagecraft/_sectionExport', array(
-      'entryTypeOptions' => $this->_getSectionOptions(),
-    ));
-  }
-
-  public function actionImport() {
-    $this->requirePostRequest();
-
-    $json = craft()->request->getParam('data', '{}');
-
-    $result = craft()->stagecraft_importExport->importFromJson($json);
-
-    if ($result->ok) {
-      craft()->userSession->setNotice('All done.');
-      $this->redirectToPostedUrl();
-      return;
-    }
-
-    craft()->userSession->setError(implode(', ', $result->errors));
-
-    craft()->urlManager->setRouteVariables(array(
-      'groupOptions' => $this->_getGroupOptions(),
-      'entryTypeOptions' => $this->_getSectionOptions()
-    ));
-  }
-
-  public function actionFieldExport() {
-    $this->requirePostRequest();
-
-    $result = new Stagecraft_ExportedDataModel(array(
-      'assets' => [],
-      'categories' => [],
-      'fields' => $this->_exportFields(),
-      'globals' => [],
-      'sections' => [],
-      'tags' => []
-    ));
-
-    $json = $result->toJson();
-
-    if (craft()->request->getParam('download')) {
-      HeaderHelper::setDownload('stagecraft.json', strlen($json));
-    }
-
-    JsonHelper::sendJsonHeaders();
-    echo $json;
-    craft()->end();
-  }
-
-  public function actionSectionExport() {
-    $this->requirePostRequest();
-
-    $section_ids = craft()->request->getParam('selectedSections', '*');
-
-    if ($section_ids == '*') {
-      $sections = craft()->sections->getAllSections();
-    } else {
-      $sections = array();
-
-      if ( is_array($section_ids) ) {
-        foreach ($section_ids as $id) {
-          $sections[] = craft()->section->getSectionById($id);
-        }
-      }
-    }
-
-    $result = new Stagecraft_ExportedDataModel(array(
-      'assets'     => [],
-      'categories' => [],
-      'fields'     => $this->_exportFields(),
-      'globals'    => [],
-      'sections'   => $this->_exportSections($sections),
-      'tags'       => []
-    ));
-
-    $json = $result->toJson();
-
-    if (craft()->request->getParam('download')) {
-      HeaderHelper::setDownload('stagecraft.json', strlen($json));
-    }
-
-    JsonHelper::sendJsonHeaders();
-    echo $json;
-    craft()->end();
-  }
-
-  // TODO create button for exporting err'thang
   public function actionExport() {
     $this->requirePostRequest();
 
@@ -159,7 +65,7 @@ class StagecraftController extends BaseController {
     craft()->end();
   }
 
-  private function _getGroupOptions() {
+  private function _getFieldGroups() {
     $groupOptions = array();
 
     foreach (craft()->fields->getAllGroups() as $group) {
@@ -169,12 +75,12 @@ class StagecraftController extends BaseController {
     return $groupOptions;
   }
 
-  private function _getSectionOptions() {
+  private function _getSections() {
     foreach (craft()->sections->getAllSections() as $section) {
-      $entryTypeOptions[$section->id] = $section->name;
+      $sectionOptions[$section->id] = $section->name;
     }
 
-    return $entryTypeOptions;
+    return $sectionOptions;
   }
 
   private function _exportAssets() {
@@ -207,9 +113,19 @@ class StagecraftController extends BaseController {
     return array();
   }
 
-  private function _exportSections($sections = array()) {
-    if (empty($sections)) {
+  private function _exportSections() {
+    $section_ids = craft()->request->getParam('selectedSections', '*');
+
+    if ($section_ids == '*') {
       $sections = craft()->sections->getAllSections();
+    } else {
+      $sections = array();
+
+      if ( is_array($section_ids) ) {
+        foreach ($section_ids as $id) {
+          $sections[] = craft()->section->getSectionById($id);
+        }
+      }
     }
 
     return craft()->stagecraft_sections->export($sections);

@@ -7,7 +7,7 @@ class StagecraftPlugin extends BasePlugin {
   }
 
   public function getDescription() {
-    return 'Custom business logic for this unique website.';
+    return 'Import and export fields and sections to and from a Craft site.';
   }
 
   public function getVersion() {
@@ -34,7 +34,6 @@ class StagecraftPlugin extends BasePlugin {
     return array(
       'stagecraft' => array('action' => 'stagecraft/exportFields'),
       'stagecraft/version1' => array('action' => 'stagecraft/index'),
-      'stagecraft/export/tabs' => array('action' => 'stagecraft/exportTabs'),
       'stagecraft/export/fields' => array('action' => 'stagecraft/exportFields'),
       'stagecraft/export/sections' => array('action' => 'stagecraft/exportSections'),
       'stagecraft/import/1' => array('action' => 'stagecraft/importStep1'),

@@ -23,7 +23,6 @@ import: { label: "Import"|t, url: url('stagecraft/import/1') },
     <ul>
       <li><a href="{{ url('stagecraft/export/fields') }}">Fields</a></li>
       <li><a href="{{ url('stagecraft/export/sections') }}" class="sel">Sections</a></li>
-      <li><a href="{{ url('stagecraft/export/tabs') }}" >Tabs</a></li>
     </ul>
   </nav>
 {% endset %}
@@ -47,7 +46,7 @@ import: { label: "Import"|t, url: url('stagecraft/import/1') },
           <div class="item">
             {{ forms.checkboxSelectField({
               label: 'Select Sections to Export',
-              name: 'selectedEntryTypes',
+              name: 'selectedSections',
               options: entryTypeOptions
             }) }}
           </div>

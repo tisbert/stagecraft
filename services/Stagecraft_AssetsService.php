@@ -1,6 +1,5 @@
 <?php namespace Craft;
 
-
 class Stagecraft_AssetsService extends BaseApplicationComponent {
 
   public function import($assets) {

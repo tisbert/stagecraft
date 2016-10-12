@@ -1,11 +1,13 @@
 <?php namespace Craft;
 
+// TODO comment file
+
 class StagecraftController extends BaseController {
 
   public function actionIndex() {
     $this->renderTemplate('stagecraft/_index', array(
       'groupOptions'     => $this->_getGroupOptions(),
-      'entryTypeOptions' => $this->_getEntryTypeOptions(),
+      'entryTypeOptions' => $this->_getSectionOptions(),
     ));
   }
 
@@ -40,31 +42,6 @@ class StagecraftController extends BaseController {
     craft()->userSession->setError(implode(', ', $result->errors));
   }
 
-  public function actionImportStep4() {
-    $this->requirePostRequest();
-
-    $json = craft()->request->getParam('data', '{}');
-    $applyTo = craft()->request->getParam('applyTo', '{}');
-
-    $result = craft()->stagecraft_importExport->importFromJson($json);
-
-    if ($result->ok) {
-      $result = craft()->stagecraft_importExport->importTabsFromJson($json, $applyTo);
-
-      if ($result->ok) {
-        $this->renderTemplate('stagecraft/_import3', array());
-      }
-    }
-
-    craft()->userSession->setError(implode(', ', $result->errors));
-  }
-
-  public function actionExportTabs() {
-    $this->renderTemplate('stagecraft/_tabExport', array(
-      'entryTypeTabOptions' => $this->_getEntryTypeTabOptions(),
-    ));
-  }
-
   public function actionExportFields() {
     $this->renderTemplate('stagecraft/_fieldExport', array(
       'GroupOptions' => $this->_getGroupOptions(),
@@ -73,7 +50,7 @@ class StagecraftController extends BaseController {
 
   public function actionExportSections() {
     $this->renderTemplate('stagecraft/_sectionExport', array(
-      'entryTypeOptions' => $this->_getEntryTypeOptions(),
+      'entryTypeOptions' => $this->_getSectionOptions(),
     ));
   }
 
@@ -94,7 +71,7 @@ class StagecraftController extends BaseController {
 
     craft()->urlManager->setRouteVariables(array(
       'groupOptions' => $this->_getGroupOptions(),
-      'entryTypeOptions' => $this->_getEntryTypeOptions()
+      'entryTypeOptions' => $this->_getSectionOptions()
     ));
   }
 
@@ -107,14 +84,13 @@ class StagecraftController extends BaseController {
       'fields' => $this->_exportFields(),
       'globals' => [],
       'sections' => [],
-      'contenttabs' => [],
       'tags' => []
     ));
 
     $json = $result->toJson();
 
     if (craft()->request->getParam('download')) {
-      HeaderHelper::setDownload('export.json', strlen($json));
+      HeaderHelper::setDownload('stagecraft.json', strlen($json));
     }
 
     JsonHelper::sendJsonHeaders();
@@ -125,20 +101,33 @@ class StagecraftController extends BaseController {
   public function actionSectionExport() {
     $this->requirePostRequest();
 
+    $section_ids = craft()->request->getParam('selectedSections', '*');
+
+    if ($section_ids == '*') {
+      $sections = craft()->sections->getAllSections();
+    } else {
+      $sections = array();
+
+      if ( is_array($section_ids) ) {
+        foreach ($section_ids as $id) {
+          $sections[] = craft()->section->getSectionById($id);
+        }
+      }
+    }
+
     $result = new Stagecraft_ExportedDataModel(array(
-      'assets' => [],
+      'assets'     => [],
       'categories' => [],
-      'fields' => $this->_exportSectionFields(),
-      'globals' => [],
-      'sections' => $this->_exportSections(),
-      'contenttabs' => [],
-      'tags' => []
+      'fields'     => $this->_exportFields(),
+      'globals'    => [],
+      'sections'   => $this->_exportSections($sections),
+      'tags'       => []
     ));
 
     $json = $result->toJson();
 
     if (craft()->request->getParam('download')) {
-      HeaderHelper::setDownload('export.json', strlen($json));
+      HeaderHelper::setDownload('stagecraft.json', strlen($json));
     }
 
     JsonHelper::sendJsonHeaders();
@@ -146,48 +135,23 @@ class StagecraftController extends BaseController {
     craft()->end();
   }
 
-
+  // TODO create button for exporting err'thang
   public function actionExport() {
     $this->requirePostRequest();
 
     $result = new Stagecraft_ExportedDataModel(array(
-      'assets1' => $this->_exportAssets(),
+      'assets' => $this->_exportAssets(),
       'categories' => $this->_exportCategories(),
       'fields' => $this->_exportFields(),
       'globals' => $this->_exportGlobals(),
       'sections' => $this->_exportSections(),
-      'contenttabs' => [],
       'tags' => $this->_exportTags()
     ));
 
     $json = $result->toJson();
 
     if (craft()->request->getParam('download')) {
-      HeaderHelper::setDownload('export.json', strlen($json));
-    }
-
-    JsonHelper::sendJsonHeaders();
-    echo $json;
-    craft()->end();
-  }
-
-  public function actionTabExport() {
-    $this->requirePostRequest();
-
-    $result = new Stagecraft_ExportedDataModel(array(
-      'assets' => [],
-      'categories' => [],
-      'fields' => $this->_exportSectionTabFields(),
-      'globals' => [],
-      'sections' => [],
-      'contenttabs' => $this->_exportSectionTabs(),
-      'tags' => []
-    ));
-
-    $json = $result->toJson();
-
-    if (craft()->request->getParam('download')) {
-      HeaderHelper::setDownload('export.json', strlen($json));
+      HeaderHelper::setDownload('stagecraft.json', strlen($json));
     }
 
     JsonHelper::sendJsonHeaders();
@@ -205,32 +169,12 @@ class StagecraftController extends BaseController {
     return $groupOptions;
   }
 
-  private function _getEntryTypeOptions() {
-    $entryTypeOptions = array();
-
+  private function _getSectionOptions() {
     foreach (craft()->sections->getAllSections() as $section) {
-      foreach ($section->getEntryTypes() as $entryType) {
-        $entryTypeOptions[$entryType->id] = $section->name.' - '.$entryType->name;
-      }
+      $entryTypeOptions[$section->id] = $section->name;
     }
 
     return $entryTypeOptions;
-  }
-
-  private function _getEntryTypeTabOptions() {
-    $entryTypeTabOptions = array();
-
-    foreach (craft()->sections->getAllSections() as $section) {
-      foreach ($section->getEntryTypes() as $entryType) {
-          $fieldLayout = $entryType->getFieldLayout();
-
-          foreach ($fieldLayout->getTabs() as $tab) {
-            $entryTypeTabOptions[$entryType->id . '|' . $tab->name] = '<div class="esection">' . $section->name.'</div><div class="contenttype">'.$entryType->name . '</div><div class="contenttab">' . $tab->name . '</div>';
-          }
-      }
-    }
-
-    return $entryTypeTabOptions;
   }
 
   private function _exportAssets() {
@@ -263,88 +207,12 @@ class StagecraftController extends BaseController {
     return array();
   }
 
-  private function _exportSections() {
-    $selectedIds = craft()->request->getParam('selectedEntryTypes', '*');
-
-    if ($selectedIds == '*') {
+  private function _exportSections($sections = array()) {
+    if (empty($sections)) {
       $sections = craft()->sections->getAllSections();
-      $entryTypeIds = null;
-    } else {
-      $sections = array();
-      $entryTypeIds = array();
-
-      if (is_array($selectedIds)) {
-        foreach ($selectedIds as $id) {
-          $entryType = craft()->sections->getEntryTypeById($id);
-
-          $sections[] = $entryType->getSection();
-          $entryTypeIds[] = $entryType->id;
-        }
-      }
     }
 
-    return craft()->stagecraft_sections->export($sections, $entryTypeIds);
-  }
-
-  private function _exportSectionFields() {
-    $selectedIds = craft()->request->getParam('selectedEntryTypes', '*');
-
-    if ($selectedIds == '*') {
-      $entryTypeIds = null;
-    } else {
-      $sections = array();
-      $entryTypeIds = array();
-
-      if (is_array($selectedIds)) {
-        foreach ($selectedIds as $id) {
-          $entryType = craft()->sections->getEntryTypeById($id);
-
-          $entryTypeIds[] = $entryType->id;
-        }
-      }
-    }
-
-    $sections = craft()->sections->getAllSections();
-
-    return craft()->stagecraft_fields->exportSectionFields($sections, $entryTypeIds);
-  }
-
-  private function _exportSectionTabs() {
-    $selectedTabIds = craft()->request->getParam('selectedEntryTypeTabs', '*');
-
-    if (strlen($selectedTabIds) == 0) {
-      return null;
-    }
-
-    $sectionData = explode('|', $selectedTabIds);
-
-    $sections = array();
-    $entryTypeIds = array();
-
-    $entryType = craft()->sections->getEntryTypeById($sectionData[0]);
-    $sections[] = $entryType->getSection();
-    $entryTypeIds[] = $entryType->id;
-
-    return craft()->stagecraft_contentTabs->export($sections, $entryType, $sectionData[1]);
-  }
-
-  private function _exportSectionTabFields() {
-    $selectedTabIds = craft()->request->getParam('selectedEntryTypeTabs', '*');
-
-    if (strlen($selectedTabIds) == 0) {
-      return null;
-    }
-
-    $sectionData = explode('|', $selectedTabIds);
-
-    $sections = array();
-    $entryTypeIds = array();
-
-    $entryType = craft()->sections->getEntryTypeById($sectionData[0]);
-    $sections[] = $entryType->getSection();
-    $entryTypeIds[] = $entryType->id;
-
-    return craft()->stagecraft_fields->exportTabFields($sections, $entryType, $sectionData[1]);
+    return craft()->stagecraft_sections->export($sections);
   }
 
   private function _exportTags() {

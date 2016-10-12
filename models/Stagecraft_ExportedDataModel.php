@@ -16,18 +16,18 @@ class Stagecraft_ExportedDataModel extends BaseModel {
    */
   public static function fromJson($json) {
     $data = json_decode($json, true);
-    return $data === null ? null : new static($data);
+
+    return $data ?: new static($data);
   }
 
   protected function defineAttributes() {
     return array(
-      'assets'         => AttributeType::Mixed,
-      'categories'     => AttributeType::Mixed,
-      'fields'         => AttributeType::Mixed,
-      'globals'        => AttributeType::Mixed,
-      'sections'       => AttributeType::Mixed,
-      'contenttabs'   => AttributeType::Mixed,
-      'tags'           => AttributeType::Mixed
+      'assets'      => AttributeType::Mixed,
+      'categories'  => AttributeType::Mixed,
+      'fields'      => AttributeType::Mixed,
+      'globals'     => AttributeType::Mixed,
+      'sections'    => AttributeType::Mixed,
+      'tags'        => AttributeType::Mixed
     );
   }
 

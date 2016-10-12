@@ -2,7 +2,7 @@
 
 class Stagecraft_SectionsService extends BaseApplicationComponent {
 
-  public function export(array $sections, $allowedEntryTypeIds) {
+  public function export(array $sections) {
     $sectionDefs = array();
 
     foreach ($sections as $section) {
@@ -19,15 +19,13 @@ class Stagecraft_SectionsService extends BaseApplicationComponent {
       $entryTypeDefs = array();
 
       foreach ($section->getEntryTypes() as $entryType) {
-        if ($allowedEntryTypeIds === null || in_array($entryType->id, $allowedEntryTypeIds)) {
-          $entryTypeDefs[$entryType->handle] = array(
-            'name'          => $entryType->name,
-            'hasTitleField' => $entryType->hasTitleField,
-            'titleLabel'    => $entryType->titleLabel,
-            'titleFormat'   => $entryType->titleFormat,
-            'fieldLayout'   => $this->_exportFieldLayout($entryType->getFieldLayout())
-          );
-        }
+        $entryTypeDefs[$entryType->handle] = array(
+          'name'          => $entryType->name,
+          'hasTitleField' => $entryType->hasTitleField,
+          'titleLabel'    => $entryType->titleLabel,
+          'titleFormat'   => $entryType->titleFormat,
+          'fieldLayout'   => $this->_exportFieldLayout($entryType->getFieldLayout())
+        );
       }
 
       $sectionDefs[$section->handle] = array(

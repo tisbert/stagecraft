@@ -26,13 +26,8 @@ import: { label: "Import"|t, url: url('stagecraft/import/1') },
   <div class="grid">
 
     <div class="item">
-        {% if model.contenttabs | length %}
-        <form method="POST" id="step3Form" accept-charset="UTF-8">
-          <input type="hidden" name="action" value="stagecraft/importstep4">
-        {% else %}
         <form method="POST" accept-charset="UTF-8">
           <input type="hidden" name="action" value="stagecraft/importstep3">
-        {% endif %}
 
         {% if model.fields | length %}
           <h2>Fields to be imported</h2>
@@ -108,61 +103,6 @@ import: { label: "Import"|t, url: url('stagecraft/import/1') },
 
           <hr />
         {% endif %}
-
-        {% if model.contenttabs | length %}
-          {% for key, fields in model.contenttabs %}
-          <h2>Tab to be imported - {{ key }}</h2>
-          <table id="tabTable" class="data fullwidth">
-            <thead>
-              <tr>
-                <th colspan="2">Section / Entry Type</th>
-                <th>Already has tab?</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for itm in craft.Stagecraft.EntryTypes %}
-                {% set secent = itm | split('||') %}
-                {% set canImport = true %}
-                {% set notes = '' %}
-                {% for key, group in model.fields %}
-                  {% for fkey, field in group %}
-                    {% set tabname = craft.Stagecraft.WhatTabIsFieldIn(secent[0], secent[1], fkey) %}
-                    {% if tabname != key and tabname | length %}
-                      {% set notes = notes ~ '<li>Entry type has field ' ~ fkey ~ ' in different tab - ' ~ tabname ~ '.</li>' %}
-                      {% set canImport = false %}
-                    {% endif %}
-                  {% endfor %}
-                {% endfor %}
-                {% if notes | length %}
-                  {% set notes = "<ul class='exists'>" ~ notes ~ "</ul>" %}
-                {% endif %}
-                <tr>
-                  <td class="thin">
-                    {% if canImport %}
-                      <input type="checkbox" class="sectionTabs" value="{{ itm }}" />
-                    {%  endif %}
-                  </td>
-                  <td>
-                    {% if secent[0] == secent[1] %}
-                      {{ secent[0] }}
-                    {% else %}
-                      {{ secent[0] }} - {{ secent[1] }}
-                    {%  endif %}
-                  </td>
-                  <td>{{ craft.Stagecraft.EntryTypeHasTab(secent[0], secent[1], key) ? 'Yes' : 'No'}}</td>
-                  <td>{{ notes | raw }}</td>
-                </tr>
-              {% endfor %}
-
-            </tbody>
-          </table>
-          {% endfor %}
-
-            <hr />
-        {% endif %}
-
-
 
         <input type="hidden" name="data" id="importData" value='{{ rawdata|replace({"\n":'', "\r":''}) }}' />
         <input type="hidden" name="applyTo" id="applyTo" value='' />

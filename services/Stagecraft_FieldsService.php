@@ -32,7 +32,8 @@ class Stagecraft_FieldsService extends BaseApplicationComponent {
                 'required'     => $blockTypeField->required,
                 'translatable' => $blockTypeField->translatable,
                 'type'         => $blockTypeField->type,
-                'instructions' => $blockTypeField->instructions
+                'instructions' => $blockTypeField->instructions,
+                'settings'     => $blockTypeField->settings
               );
             }
 
@@ -140,6 +141,7 @@ class Stagecraft_FieldsService extends BaseApplicationComponent {
               $blockTypeField->translatable = $blockTypeFieldDef['translatable'];
               $blockTypeField->type         = $blockTypeFieldDef['type'];
               $blockTypeField->instructions = $blockTypeFieldDef['instructions'];
+              $blockTypeField->settings     = $blockTypeFieldDef['settings'];
               $newBlockTypeFields[] = $blockTypeField;
             }
 

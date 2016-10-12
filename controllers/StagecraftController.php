@@ -6,8 +6,12 @@ class StagecraftController extends BaseController {
 
   public function actionIndex() {
     $this->renderTemplate('stagecraft/_index', array(
-      'groupOptions'   => $this->_getFieldGroups(),
-      'sectionOptions' => $this->_getSections(),
+      'assetOptions'      => $this->_getAssets(),
+      'categoryOptions'   => $this->_getCategoryGroups(),
+      'fieldGroupOptions' => $this->_getFieldGroups(),
+      'globalSetOptions'  => $this->_getGlobalSets(),
+      'sectionOptions'    => $this->_getSections(),
+      'tagGroupOptions'   => $this->_getTagGroups(),
     ));
   }
 
@@ -46,12 +50,12 @@ class StagecraftController extends BaseController {
     $this->requirePostRequest();
 
     $result = new Stagecraft_ExportedDataModel(array(
-      'assets' => $this->_exportAssets(),
+      'assets'     => $this->_exportAssets(),
       'categories' => $this->_exportCategories(),
-      'fields' => $this->_exportFields(),
-      'globals' => $this->_exportGlobals(),
-      'sections' => $this->_exportSections(),
-      'tags' => $this->_exportTags()
+      'fields'     => $this->_exportFields(),
+      'globals'    => $this->_exportGlobals(),
+      'sections'   => $this->_exportSections(),
+      'tags'       => $this->_exportTags()
     ));
 
     $json = $result->toJson();
@@ -65,22 +69,62 @@ class StagecraftController extends BaseController {
     craft()->end();
   }
 
-  private function _getFieldGroups() {
-    $groupOptions = array();
+  private function _getAssets() {
+    $assetOptions = array();
 
-    foreach (craft()->fields->getAllGroups() as $group) {
-      $groupOptions[$group->id] = $group->name;
+    // TODO break out asset sources and transforms
+
+    return $assetOptions;
+  }
+
+  private function _getCategoryGroups() {
+    $categoryOptions = array();
+
+    foreach (craft()->categories->getAllGroups() as $group) {
+      $categoryOptions[$group->id] = $group->name;
     }
 
-    return $groupOptions;
+    return $categoryOptions;
+  }
+
+  private function _getFieldGroups() {
+    $fieldGroupOptions = array();
+
+    foreach (craft()->fields->getAllGroups() as $group) {
+      $fieldGroupOptions[$group->id] = $group->name;
+    }
+
+    return $fieldGroupOptions;
+  }
+
+  private function _getGlobalSets() {
+    $globalOptions = array();
+
+    foreach (craft()->globals->getAllSets() as $set) {
+      $globalOptions[$set->id] = $set->name;
+    }
+
+    return $globalOptions;
   }
 
   private function _getSections() {
+    $sectionOptions = array();
+
     foreach (craft()->sections->getAllSections() as $section) {
       $sectionOptions[$section->id] = $section->name;
     }
 
     return $sectionOptions;
+  }
+
+  private function _getTagGroups() {
+    $tagGroupOptions = array();
+
+    foreach (craft()->tags->getAllTagGroups() as $group) {
+      $tagGroupOptions[$group->id] = $group->name;
+    }
+
+    return $tagGroupOptions;
   }
 
   private function _exportAssets() {
@@ -92,7 +136,7 @@ class StagecraftController extends BaseController {
   }
 
   private function _exportFields() {
-    $selectedIds = craft()->request->getParam('selectedGroups', '*');
+    $selectedIds = craft()->request->getParam('selectedFieldGroups', '*');
 
     if ($selectedIds == '*') {
       $groups = craft()->fields->getAllGroups();

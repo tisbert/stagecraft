@@ -1,6 +1,6 @@
 # Stagecraft
 
-Stagecraft allows you to import and export fields and section and tabs to and from a [Craft](http://buildwithcraft.com) site. This plugin is built on top of XO Digital's [Art Vandelay](https://github.com/xodigital/ArtVandelay) plugin.
+Stagecraft allows you to import and export [Craft CMS](http://buildwithcraft.com) fields, sections, tags, categories, assets, and globals.. This plugin is built on the bones of XO Digital's [Art Vandelay](https://github.com/xodigital/ArtVandelay) plugin.
 
 ## Installation
 

@@ -7,7 +7,7 @@ class StagecraftPlugin extends BasePlugin {
   }
 
   public function getDescription() {
-    return 'Import and export fields and sections to and from a Craft site.';
+    return 'Import and export Craft CMS fields, sections, tags, categories, assets, and globals.';
   }
 
   public function getVersion() {

@@ -35,9 +35,33 @@ import: { label: "Import"|t, url: url('stagecraft/import') },
         <div class="grid">
           <div class="item">
             {{ forms.checkboxSelectField({
-              label: 'Fields',
-              name: 'selectedGroups',
-              options: groupOptions
+              label: 'Assets',
+              name: 'selectedAssets',
+              options: assetOptions
+            }) }}
+          </div>
+
+          <div class="item">
+            {{ forms.checkboxSelectField({
+              label: 'Category Groups',
+              name: 'selectedCategories',
+              options: categoryOptions
+            }) }}
+          </div>
+
+          <div class="item">
+            {{ forms.checkboxSelectField({
+              label: 'Field Groups',
+              name: 'selectedFieldGroups',
+              options: fieldGroupOptions
+            }) }}
+          </div>
+
+          <div class="item">
+            {{ forms.checkboxSelectField({
+              label: 'Global Sets',
+              name: 'selectedGlobalSets',
+              options: globalSetOptions
             }) }}
           </div>
 
@@ -46,6 +70,14 @@ import: { label: "Import"|t, url: url('stagecraft/import') },
               label: 'Sections',
               name: 'selectedSections',
               options: sectionOptions
+            }) }}
+          </div>
+
+          <div class="item">
+            {{ forms.checkboxSelectField({
+              label: 'Tag Groups',
+              name: 'selectedTagGroups',
+              options: tagGroupOptions
             }) }}
           </div>
 

@@ -17,7 +17,38 @@ class Stagecraft_GlobalsService extends BaseStagecraftService {
     return $setDefs;
   }
 
-  public function import($sets) {
-    return new Stagecraft_ResultModel();
+  public function import(array $setDefs) {
+    $result = new Stagecraft_ResultModel();
+
+    if ( empty($setDefs) ) {
+      return $result;
+    }
+
+    $sets = craft()->tags->getAllTagGroups('handle');
+
+    foreach ($setDefs as $setHandle => $setDef) {
+      $set = array_key_exists($setHandle, $sets) ? $sets[$setHandle] : new TagGroupModel();
+
+      $set->handle = $setHandle;
+      $set->name   = $setDef['name'];
+
+      if (!craft()->tags->saveTagGroup($set)) {
+        return $result->error($set->getAllErrors());
+      }
+
+      $fieldLayout = $this->_importFieldLayout($setDef['fieldLayout']);
+
+      if($fieldLayout !== null) {
+        $set->setFieldLayout($fieldLayout);
+
+        if (!craft()->sections->saveEntryType($set)) {
+          return $result->error($set->getAllErrors());
+        }
+      } else {
+        return $result->error('Failed to import field layout.');
+      }
+    }
+
+    return $result;
   }
 }

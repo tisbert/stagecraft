@@ -1,6 +1,8 @@
 <?php namespace Craft;
 
-class Stagecraft_AssetsService extends BaseApplicationComponent {
+require_once __DIR__ . 'BaseStagecraftService.php';
+
+class Stagecraft_AssetsService extends BaseStagecraftService {
 
   public function import($assets) {
     return new Stagecraft_ResultModel();

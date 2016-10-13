@@ -1,12 +1,31 @@
 <?php namespace Craft;
 
-class Stagecraft_TagsService extends BaseApplicationComponent {
+require_once __DIR__ . '/BaseStagecraftService.php';
 
-  public function import($tags) {
-    return new Stagecraft_ResultModel();
+class Stagecraft_TagsService extends BaseStagecraftService {
+
+  public function export(array $groups) {
+    $groupDefs = array();
+
+    foreach ($groups as $group) {
+      $tagDefs = array();
+
+      foreach ( $group->getTags() as $tag ) {
+        $tagDefs[] = $tag->title;
+      }
+
+      $groupDefs[$group->handle][] = array(
+        'name' => $group->name,
+        'tags' => $tagDefs,
+        'fieldLayout' => $this->_exportFieldLayout($group->getFieldLayout())
+      );
+    }
+
+    return $groupDefs;
   }
 
-  public function export() {
-    //
+  // TODO import tag groups
+  public function import($groups) {
+    return new Stagecraft_ResultModel();
   }
 }

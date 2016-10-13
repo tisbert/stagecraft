@@ -1,6 +1,8 @@
 <?php namespace Craft;
 
-class Stagecraft_SectionsService extends BaseApplicationComponent {
+require_once __DIR__ . '/BaseStagecraftService.php';
+
+class Stagecraft_SectionsService extends BaseStagecraftService {
 
   public function export(array $sections) {
     $sectionDefs = array();
@@ -41,34 +43,6 @@ class Stagecraft_SectionsService extends BaseApplicationComponent {
     }
 
     return $sectionDefs;
-  }
-
-  private function _exportFieldLayout(FieldLayoutModel $fieldLayout) {
-    if ($fieldLayout->getTabs()) {
-      $tabDefs = array();
-
-      foreach ($fieldLayout->getTabs() as $tab) {
-        $tabDefs[$tab->name] = array();
-
-        foreach ($tab->getFields() as $field) {
-          $tabDefs[$tab->name][$field->getField()->handle] = $field->required;
-        }
-      }
-
-      return array(
-        'tabs' => $tabDefs
-      );
-    } else {
-      $fieldDefs = array();
-
-      foreach ($fieldLayout->getFields() as $field) {
-        $fieldDefs[$field->getField()->handle] = $field->required;
-      }
-
-      return array(
-        'fields' => $fieldDefs
-      );
-    }
   }
 
   /**
@@ -169,80 +143,5 @@ class Stagecraft_SectionsService extends BaseApplicationComponent {
     }
 
     return $result;
-  }
-
-  /**
-   * Attempt to import a field layout.
-   *
-   * @param array $fieldLayoutDef
-   *
-   * @return FieldLayoutModel
-   */
-  private function _importFieldLayout(Array $fieldLayoutDef) {
-    $layoutTabs   = array();
-    $layoutFields = array();
-
-    if (array_key_exists('tabs', $fieldLayoutDef)) {
-      $tabSortOrder = 0;
-
-      foreach ($fieldLayoutDef['tabs'] as $tabName => $tabDef) {
-        $layoutTabFields = array();
-
-        foreach ($tabDef as $fieldHandle => $required) {
-          $fieldSortOrder = 0;
-
-          $field = craft()->fields->getFieldByHandle($fieldHandle);
-
-          if ($field) {
-            $layoutField = new FieldLayoutFieldModel();
-
-            $layoutField->setAttributes(array(
-              'fieldId'   => $field->id,
-              'required'  => $required,
-              'sortOrder' => ++$fieldSortOrder
-            ));
-
-            $layoutTabFields[] = $layoutField;
-            $layoutFields[] = $layoutField;
-          }
-        }
-
-        $layoutTab = new FieldLayoutTabModel();
-
-        $layoutTab->setAttributes(array(
-          'name' => $tabName,
-          'sortOrder' => ++$tabSortOrder
-        ));
-
-        $layoutTab->setFields($layoutTabFields);
-
-        $layoutTabs[] = $layoutTab;
-      }
-    } else if (array_key_exists('fields', $fieldLayoutDef)) {
-      $fieldSortOrder = 0;
-
-      foreach ($fieldLayoutDef['fields'] as $fieldHandle => $required) {
-        $field = craft()->fields->getFieldByHandle($fieldHandle);
-
-        if ($field) {
-          $layoutField = new FieldLayoutFieldModel();
-
-          $layoutField->setAttributes(array(
-            'fieldId'   => $field->id,
-            'required'  => $required,
-            'sortOrder' => ++$fieldSortOrder
-          ));
-
-          $layoutFields[] = $layoutField;
-        }
-      }
-    }
-
-    $fieldLayout = new FieldLayoutModel();
-    $fieldLayout->type = ElementType::Entry;
-    $fieldLayout->setTabs($layoutTabs);
-    $fieldLayout->setFields($layoutFields);
-
-    return $fieldLayout;
   }
 }

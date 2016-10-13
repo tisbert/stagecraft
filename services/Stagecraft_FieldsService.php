@@ -1,6 +1,8 @@
 <?php namespace Craft;
 
-class Stagecraft_FieldsService extends BaseApplicationComponent {
+require_once __DIR__ . 'BaseStagecraftService.php';
+
+class Stagecraft_FieldsService extends BaseStagecraftService {
 
   public function export(array $groups) {
     $groupDefs = array();

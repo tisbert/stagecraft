@@ -1,6 +1,6 @@
 <?php namespace Craft;
 
-require_once __DIR__ . 'BaseStagecraftService.php';
+require_once __DIR__ . '/BaseStagecraftService.php';
 
 class Stagecraft_FieldsService extends BaseStagecraftService {
 

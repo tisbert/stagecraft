@@ -10,9 +10,9 @@ class Stagecraft_CategoriesService extends BaseStagecraftService {
     foreach ($groups as $group) {
       $categoryDefs = array();
 
-      foreach ( $group->getCategories() as $category ) {
-        $categoryDefs[] = $category->title;
-      }
+      // foreach ( $group->categories as $category ) {
+      //   $categoryDefs[] = $category->title;
+      // }
 
       $categoryGroupLocaleDefs = array();
 

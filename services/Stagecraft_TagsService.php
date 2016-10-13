@@ -10,9 +10,9 @@ class Stagecraft_TagsService extends BaseStagecraftService {
     foreach ($groups as $group) {
       $tagDefs = array();
 
-      foreach ( $group->getTags() as $tag ) {
-        $tagDefs[] = $tag->title;
-      }
+      // foreach ( $group->getTags() as $tag ) {
+      //   $tagDefs[] = $tag->title;
+      // }
 
       $groupDefs[$group->handle][] = array(
         'name' => $group->name,

@@ -24,8 +24,38 @@ class Stagecraft_TagsService extends BaseStagecraftService {
     return $groupDefs;
   }
 
-  // TODO import tag groups
-  public function import($groups) {
-    return new Stagecraft_ResultModel();
+  public function import(array $groupDefs) {
+    $result = new Stagecraft_ResultModel();
+
+    if ( empty($groupDefs) ) {
+      return $result;
+    }
+
+    $groups = craft()->tags->getAllTagGroups('handle');
+
+    foreach ($groupDefs as $groupHandle => $groupDef) {
+      $group = array_key_exists($groupHandle, $groups) ? $groups[$groupHandle] : new TagGroupModel();
+
+      $group->handle = $groupHandle;
+      $group->name   = $groupDef['name'];
+
+      if (!craft()->tags->saveTagGroup($group)) {
+        return $result->error($group->getAllErrors());
+      }
+
+      $fieldLayout = $this->_importFieldLayout($groupDef['fieldLayout']);
+
+      if($fieldLayout !== null) {
+        $group->setFieldLayout($fieldLayout);
+
+        if (!craft()->sections->saveEntryType($group)) {
+          return $result->error($group->getAllErrors());
+        }
+      } else {
+        return $result->error('Failed to import field layout.');
+      }
+    }
+
+    return $result;
   }
 }

@@ -136,7 +136,6 @@ class Stagecraft_SectionsService extends BaseStagecraftService {
             return $result->error($entryType->getAllErrors());
           }
         } else {
-          // Todo: Too ambiguous.
           return $result->error('Failed to import field layout.');
         }
       }

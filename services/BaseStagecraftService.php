@@ -2,8 +2,8 @@
 
 abstract class BaseStagecraftService extends BaseApplicationComponent {
 
-  abstract public function export();
-  abstract public function import();
+  abstract public function export(array $input);
+  abstract public function import($input);
 
   protected function _exportFieldLayout(FieldLayoutModel $fieldLayout) {
     if ($fieldLayout->getTabs()) {

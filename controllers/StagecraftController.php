@@ -132,19 +132,33 @@ class StagecraftController extends BaseController {
   }
 
   private function _exportCategories() {
-    return array();
+    $group_ids = craft()->request->getParam('selectedCategoryGroups', '*');
+
+    if ($group_ids == '*') {
+      $groups = craft()->categories->getAllGroups();
+    } else {
+      $groups = array();
+
+      if ( is_array($group_ids) ) {
+        foreach ($group_ids as $id) {
+          $groups[] = craft()->categories->getGroupById($id);
+        }
+      }
+    }
+
+    return craft()->stagecraft_categories->export($groups);
   }
 
   private function _exportFields() {
-    $selectedIds = craft()->request->getParam('selectedFieldGroups', '*');
+    $group_ids = craft()->request->getParam('selectedFieldGroups', '*');
 
-    if ($selectedIds == '*') {
+    if ($group_ids == '*') {
       $groups = craft()->fields->getAllGroups();
     } else {
       $groups = array();
 
-      if (is_array($selectedIds)) {
-        foreach ($selectedIds as $id) {
+      if (is_array($group_ids)) {
+        foreach ($group_ids as $id) {
           $groups[] = craft()->fields->getGroupById($id);
         }
       }
@@ -154,7 +168,21 @@ class StagecraftController extends BaseController {
   }
 
   private function _exportGlobals() {
-    return array();
+    $set_ids = craft()->request->getParam('selectedGlobalSets', '*');
+
+    if ($set_ids == '*') {
+      $sets = craft()->globals->getAllSets();
+    } else {
+      $sets = array();
+
+      if ( is_array($set_ids) ) {
+        foreach ($set_ids as $id) {
+          $sets[] = craft()->globals->getSetById($id);
+        }
+      }
+    }
+
+    return craft()->stagecraft_globals->export($sets);
   }
 
   private function _exportSections() {
@@ -176,6 +204,20 @@ class StagecraftController extends BaseController {
   }
 
   private function _exportTags() {
-    return array();
+    $group_ids = craft()->request->getParam('selectedTagGroups', '*');
+
+    if ($group_ids == '*') {
+      $groups = craft()->tags->getAllTagGroups();
+    } else {
+      $groups = array();
+
+      if ( is_array($group_ids) ) {
+        foreach ($group_ids as $id) {
+          $groups[] = craft()->tags->getTagGroupById($id);
+        }
+      }
+    }
+
+    return craft()->stagecraft_tags->export($groups);
   }
 }

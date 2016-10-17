@@ -1,7 +1,5 @@
 <?php namespace Craft;
 
-// TODO comment file
-
 class StagecraftController extends BaseController {
 
   public function actionIndex() {

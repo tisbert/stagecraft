@@ -8,12 +8,6 @@ class Stagecraft_CategoriesService extends BaseStagecraftService {
     $groupDefs = array();
 
     foreach ($groups as $group) {
-      $categoryDefs = array();
-
-      // foreach ( $group->categories as $category ) {
-      //   $categoryDefs[] = $category->title;
-      // }
-
       $categoryGroupLocaleDefs = array();
 
       foreach ( $group->getLocales() as $locale ) {
@@ -24,12 +18,11 @@ class Stagecraft_CategoriesService extends BaseStagecraftService {
         );
       }
 
-      $groupDefs[$group->handle][] = array(
+      $groupDefs[$group->handle] = array(
         'name' => $group->name,
         'hasUrls' => $group->hasUrls,
         'template' => $group->template,
         'maxLevels' => $group->maxLevels,
-        'categories' => $categoryDefs,
         'fieldLayout' => $this->_exportFieldLayout($group->getFieldLayout())
       );
     }
@@ -37,7 +30,41 @@ class Stagecraft_CategoriesService extends BaseStagecraftService {
     return $groupDefs;
   }
 
-  public function import($groups) {
-    return new Stagecraft_ResultModel();
+  public function import(array $groupDefs) {
+    $result = new Stagecraft_ResultModel();
+
+    if ( empty($groupDefs) ) {
+      return $result;
+    }
+
+    $groups = craft()->categories->getAllGroups('handle');
+
+    foreach ($groupDefs as $groupHandle => $groupDef) {
+      $group = array_key_exists($groupHandle, $groups) ? $groups[$groupHandle] : new CategoryGroupModel();
+
+      $group->handle    = $groupHandle;
+      $group->name      = $groupDef['name'];
+      $group->hasUrls   = $groupDef['hasUrls'];
+      $group->template  = $groupDef['template'];
+      $group->maxLevels = $groupDef['maxLevels'];
+
+      if (!craft()->categories->saveGroup($group)) {
+        return $result->error($group->getAllErrors());
+      }
+
+      $fieldLayout = $this->_importFieldLayout($groupDef['fieldLayout']);
+
+      if($fieldLayout !== null) {
+        $group->setFieldLayout($fieldLayout);
+
+        if (!craft()->categories->saveGroup($group)) {
+          return $result->error($group->getAllErrors());
+        }
+      } else {
+        return $result->error('Failed to import field layout.');
+      }
+    }
+
+    return $result;
   }
 }

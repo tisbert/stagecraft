@@ -8,15 +8,8 @@ class Stagecraft_TagsService extends BaseStagecraftService {
     $groupDefs = array();
 
     foreach ($groups as $group) {
-      $tagDefs = array();
-
-      // foreach ( $group->getTags() as $tag ) {
-      //   $tagDefs[] = $tag->title;
-      // }
-
-      $groupDefs[$group->handle][] = array(
+      $groupDefs[$group->handle] = array(
         'name' => $group->name,
-        'tags' => $tagDefs,
         'fieldLayout' => $this->_exportFieldLayout($group->getFieldLayout())
       );
     }
@@ -48,7 +41,7 @@ class Stagecraft_TagsService extends BaseStagecraftService {
       if($fieldLayout !== null) {
         $group->setFieldLayout($fieldLayout);
 
-        if (!craft()->sections->saveEntryType($group)) {
+        if (!craft()->tags->saveTagGroup($group)) {
           return $result->error($group->getAllErrors());
         }
       } else {

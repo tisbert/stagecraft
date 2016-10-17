@@ -52,7 +52,7 @@ class Stagecraft_SectionsService extends BaseStagecraftService {
    *
    * @return Stagecraft_ResultModel
    */
-  public function import($sectionDefs) {
+  public function import(array $sectionDefs) {
     $result = new Stagecraft_ResultModel();
 
     if(empty($sectionDefs)) {

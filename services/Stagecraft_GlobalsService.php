@@ -8,7 +8,7 @@ class Stagecraft_GlobalsService extends BaseStagecraftService {
     $setDefs = array();
 
     foreach ($sets as $set) {
-      $setDefs[$set->handle][] = array(
+      $setDefs[$set->handle] = array(
         'name' => $set->name,
         'fieldLayout' => $this->_exportFieldLayout($set->getFieldLayout())
       );
@@ -24,15 +24,15 @@ class Stagecraft_GlobalsService extends BaseStagecraftService {
       return $result;
     }
 
-    $sets = craft()->tags->getAllTagGroups('handle');
+    $sets = craft()->globals->getAllSets('handle');
 
     foreach ($setDefs as $setHandle => $setDef) {
-      $set = array_key_exists($setHandle, $sets) ? $sets[$setHandle] : new TagGroupModel();
+      $set = array_key_exists($setHandle, $sets) ? $sets[$setHandle] : new GlobalSetModel();
 
       $set->handle = $setHandle;
       $set->name   = $setDef['name'];
 
-      if (!craft()->tags->saveTagGroup($set)) {
+      if (!craft()->globals->saveSet($set)) {
         return $result->error($set->getAllErrors());
       }
 
@@ -41,7 +41,7 @@ class Stagecraft_GlobalsService extends BaseStagecraftService {
       if($fieldLayout !== null) {
         $set->setFieldLayout($fieldLayout);
 
-        if (!craft()->sections->saveEntryType($set)) {
+        if (!craft()->globals->saveSet($set)) {
           return $result->error($set->getAllErrors());
         }
       } else {

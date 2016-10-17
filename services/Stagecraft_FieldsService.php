@@ -62,7 +62,7 @@ class Stagecraft_FieldsService extends BaseStagecraftService {
    *
    * @return Stagecraft_ResultModel
    */
-  public function import($groupDefs) {
+  public function import(array $groupDefs) {
     $result = new Stagecraft_ResultModel();
 
     if(empty($groupDefs)) {
